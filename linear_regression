@@ -1,0 +1,101 @@
+import controlP5.*;
+ControlP5 cp5;
+float a, b;
+float err = 0;
+
+int wid = 1200;
+int hei = 900;
+
+int x1 = 300, y1 = 250+int(random(-25, 25));
+int x2 = 400, y2 = 300+int(random(-25, 25));
+int x3 = 500, y3 = 350+int(random(-25, 25));
+int x4 = 600, y4 = 400+int(random(-25, 25));
+int x5 = 700, y5 = 450+int(random(-25, 25));
+int x6 = 800, y6 = 500+int(random(-25, 25));
+int x7 = 900, y7 = 550+int(random(-25, 25));
+
+void setup() {
+  size(1200, 900);
+  cp5 = new ControlP5(this); // コントローラを生成
+  cp5.addSlider("a") // aの値を動かすスライダー
+    .setPosition(20, 20)
+    .setSize(500, 60)
+    .setRange(0, 1.5)
+    .setValue(0.3)
+    .setColorCaptionLabel(0)
+    ;
+  cp5.addSlider("b") // bの値を動かすスライダー
+    .setPosition(570, 20)
+    .setSize(500, 50)
+    .setRange(-100, 500)
+    .setValue(0)
+    .setColorCaptionLabel(0)
+    ;
+}
+
+void draw() {
+  background(255);
+  fill(a);
+  arrow(100, 200, 1000, 200, 0, 0, 0, 3); // x軸の矢印
+  arrow(200, 100, 200, 800, 0, 0, 0, 3); // y軸の矢印
+
+  //100pixel line
+  strokeWeight(1);
+  for (int i = 0; i <= max(wid, hei); i+=100) {
+    line(0, i, wid, i); //横線
+    line(i, 0, i, hei); //縦線
+  }
+
+  // データポイント
+  fill(0);
+  int size = 20;
+  ellipse(x1, y1, size, size);
+  ellipse(x2, y2, size, size);
+  ellipse(x3, y3, size, size);
+  ellipse(x4, y4, size, size);
+  ellipse(x5, y5, size, size);
+  ellipse(x6, y6, size, size);
+  ellipse(x7, y7, size, size);
+
+  // 1次関数の直線
+  strokeWeight(5);
+  stroke(255, 0, 0);
+  line(200, 200+b, 1000, min(hei-100, a*800+b+200));
+
+  // データと直線の誤差
+  strokeWeight(10);
+  stroke(0, 0, 255);
+  line(x1, y1, x1, 200+a*(x1-200)+b);
+  line(x2, y2, x2, 200+a*(x2-200)+b);
+  line(x3, y3, x3, 200+a*(x3-200)+b);
+  line(x4, y4, x4, 200+a*(x4-200)+b);
+  line(x5, y5, x5, 200+a*(x5-200)+b);
+  line(x6, y6, x6, 200+a*(x6-200)+b);
+  line(x7, y7, x7, 200+a*(x7-200)+b);
+  
+  // 誤差の積算とメーターの表示
+  int err_sum = round(abs(y1-(200+a*(x1-200)+b))) + round(abs(y2-(200+a*(x2-200)+b))) + round(abs(y3-(200+a*(x3-200)+b))) + round(abs(y4-(200+a*(x4-200)+b))) + round(abs(y5-(200+a*(x5-200)+b))) + round(abs(y6-(200+a*(x6-200)+b))) + round(abs(y7-(200+a*(x7-200)+b)));
+  noStroke();
+  fill(100, 100, 100);
+  rect(1050, 200, 100, 600); // 背景
+  fill(0, 0, 255);
+  rect(1052, 202, 96, err_sum-4); // メーター
+  
+}
+
+
+// 矢印用関数
+void arrow(int x1, int y1, int x2, int y2, int Color1, int Color2, int Color3, int lineWidth) {
+  int arrowLength = 10;
+  float arrowAngle = 0.5;
+  float angle = atan2(y2-y1, x2-x1);
+  stroke(Color1, Color2, Color3);
+  strokeWeight(lineWidth);
+  line(x1, y1, x2, y2);
+  pushMatrix();
+  translate(x2, y2);
+  rotate(angle);
+  line(0, 0, -arrowLength*cos(arrowAngle), arrowLength*sin(arrowAngle));
+  line(0, 0, -arrowLength*cos(arrowAngle), -arrowLength*sin(arrowAngle));
+  popMatrix();
+}
